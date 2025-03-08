@@ -14,7 +14,7 @@ PubMed Fetcher is a Python-based command-line tool designed to retrieve research
 ## Installation
 
 ### Prerequisites
-- Python 3.12+
+- Python 3.8+
 - Poetry (for dependency management)
 
 ### Steps
