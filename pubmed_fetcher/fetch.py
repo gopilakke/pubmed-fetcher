@@ -1,6 +1,11 @@
 import requests
 import xml.etree.ElementTree as ET
+import logging
 from typing import List, Dict
+
+# ✅ Configure Logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 # ✅ Step 1: Fetch paper IDs from PubMed
 def fetch_pubmed_papers(query: str, max_results: int = 10) -> List[str]:
@@ -13,21 +18,27 @@ def fetch_pubmed_papers(query: str, max_results: int = 10) -> List[str]:
         "retmax": max_results
     }
 
-    response = requests.get(base_url, params=params)
-    
-    if response.status_code != 200:
-        print(f"Error fetching data: {response.status_code}")
+    try:
+        response = requests.get(base_url, params=params, timeout=10)
+        response.raise_for_status()
+    except requests.RequestException as e:
+        logger.error(f"Error fetching paper IDs: {e}")
         return []
 
     data = response.json()
     paper_ids = data.get("esearchresult", {}).get("idlist", [])
 
+    if not paper_ids:
+        logger.warning(f"No papers found for query: {query}")
+
+    logger.info(f"Fetched {len(paper_ids)} paper IDs for query: {query}")
     return paper_ids
 
 # ✅ Step 2: Fetch Paper Details
 def fetch_paper_details(paper_ids: List[str]) -> List[Dict]:
     """Fetch detailed information for a list of paper IDs from PubMed."""
     if not paper_ids:
+        logger.warning("No paper IDs provided. Skipping fetch_paper_details.")
         return []
 
     details_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
@@ -37,16 +48,20 @@ def fetch_paper_details(paper_ids: List[str]) -> List[Dict]:
         "retmode": "xml"
     }
 
-    response = requests.get(details_url, params=params)
-
-    if response.status_code != 200:
-        print(f"Error fetching paper details: {response.status_code}")
+    try:
+        response = requests.get(details_url, params=params, timeout=10)
+        response.raise_for_status()
+    except requests.RequestException as e:
+        logger.error(f"Error fetching paper details: {e}")
         return []
 
-    # Parse XML response
-    root = ET.fromstring(response.text)
-    papers = []
+    try:
+        root = ET.fromstring(response.text)
+    except ET.ParseError as e:
+        logger.error(f"Error parsing XML response: {e}")
+        return []
 
+    papers = []
     for article in root.findall(".//PubmedArticle"):
         paper_data = {}
 
@@ -83,4 +98,6 @@ def fetch_paper_details(paper_ids: List[str]) -> List[Dict]:
 
         papers.append(paper_data)
 
+    logger.info(f"Fetched details for {len(papers)} papers.")
     return papers
+
