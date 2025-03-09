@@ -1,71 +1,77 @@
- 
 # PubMed Fetcher
 
 ## Overview
-PubMed Fetcher is a Python-based command-line tool designed to retrieve research papers from PubMed, filter non-academic authors affiliated with pharmaceutical/biotech companies, and output the results as a CSV file.
+PubMed Fetcher is a Python command-line tool designed to fetch research papers from PubMed, filter out non-academic authors affiliated with pharmaceutical/biotech companies, and output the results as a CSV file.
 
 ## Features
-- Fetches research papers from PubMed
-- Filters non-academic authors based on heuristics (e.g., email addresses, keywords like 'university', 'labs')
-- Outputs results in a structured CSV format
-- Implemented as a modular Python package
-- CLI tool for easy execution
+- Fetches research papers from PubMed.
+- Identifies papers with at least one non-academic author.
+- Supports CSV output for filtered results.
+- Implements heuristics to detect non-academic affiliations.
+- Provides a CLI interface for ease of use.
 
 ## Installation
-
 ### Prerequisites
 - Python 3.8+
 - Poetry (for dependency management)
 
-### Steps
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/gopilakke/pubmed-fetcher.git
-   cd pubmed-fetcher
-   ```
-2. Install dependencies using Poetry:
-   ```sh
-   poetry install
-   ```
-3. Activate the virtual environment:
-   ```sh
-   poetry shell
-   ```
+### Install from TestPyPI
+```sh
+pip install --index-url https://test.pypi.org/simple/ --no-deps gopi-pubmed-fetcher
+```
+
+### Clone and Install Locally
+```sh
+git clone https://github.com/yourusername/pubmed-fetcher.git
+cd pubmed-fetcher
+poetry install
+```
 
 ## Usage
-
-### Running the CLI tool
-To fetch and filter research papers, use:
+### CLI Usage
+Run the command-line tool to fetch papers based on a search query:
 ```sh
 get-papers-list --query "diabetes" --output results.csv
 ```
-Options:
-- `--query` : Search term for PubMed
-- `--output` : Output CSV filename
 
-### Running as a Python Module
-```python
-from pubmed_fetcher import fetch_papers
-fetch_papers("diabetes", "results.csv")
-```
+### Arguments
+- `--query`: Search query for PubMed.
+- `--output`: File path for the CSV output.
+- `--debug`: Enable debug mode for logging.
 
 ## Project Structure
 ```
-pubmed-fetcher/
-│── cli/
-│   ├── main.py  # CLI entry point
-│── pubmed_fetcher/
-│   ├── fetch.py  # Core fetching logic
-│   ├── filter.py  # Author filtering logic
-│── pyproject.toml  # Poetry config
-│── README.md
+├── cli
+│   ├── __init__.py
+│   ├── main.py
+├── pubmed_fetcher
+│   ├── __init__.py
+│   ├── fetch.py
+│   ├── filter.py
+│   ├── export.py
+├── tests
+│   ├── test_filter.py
+├── pyproject.toml
+├── poetry.lock
+├── README.md
 ```
 
-## Contributing
-1. Fork the repository
-2. Create a new branch
-3. Commit your changes
-4. Push to your fork and submit a PR
+## Development
+### Running Tests
+```sh
+pytest tests/
+```
+
+### Building the Package
+```sh
+poetry build
+```
+
+### Publishing to TestPyPI
+```sh
+poetry publish -r testpypi
+```
 
 ## License
 This project is licensed under the MIT License.
+
